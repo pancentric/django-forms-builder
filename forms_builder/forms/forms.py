@@ -8,7 +8,7 @@ from uuid import uuid4
 import django
 from django import forms
 from django.forms.extras import SelectDateWidget
-from django.core.files.storage import FileSystemStorage
+from django.core.files.storage import default_storage, FileSystemStorage
 from django.core.urlresolvers import reverse
 from django.template import Template
 from django.utils.safestring import mark_safe
@@ -20,7 +20,11 @@ from forms_builder.forms import settings
 from forms_builder.forms.utils import now, split_choices
 
 
-fs = FileSystemStorage(location=settings.UPLOAD_ROOT)
+if settings.UPLOAD_ROOT:
+    fs = FileSystemStorage(location=settings.UPLOAD_ROOT)
+else:
+    fs = default_storage
+
 
 ##############################
 # Each type of export filter #
