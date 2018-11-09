@@ -14,6 +14,7 @@ from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template import RequestContext
 from django.utils.http import urlquote
 from django.views.generic.base import TemplateView
+from django.shortcuts import render
 from email_extras.utils import send_mail_template
 
 from forms_builder.forms.forms import FormForForm
@@ -120,4 +121,4 @@ def form_sent(request, slug, template="forms/form_sent.html"):
     """
     published = Form.objects.published(for_user=request.user)
     context = {"form": get_object_or_404(published, slug=slug)}
-    return render_to_response(template, context, RequestContext(request))
+    return render(request, template, context)
