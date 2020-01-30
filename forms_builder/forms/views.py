@@ -10,7 +10,7 @@ except ImportError:
     # For Django 1.8 compatibility
     from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseBadRequest
-from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.shortcuts import get_object_or_404, redirect
 from django.template import RequestContext
 from django.utils.http import urlquote
 from django.views.generic.base import TemplateView
@@ -62,8 +62,7 @@ class FormDetail(TemplateView):
             form_valid.send(sender=request, form=form_for_form, entry=entry)
             self.send_emails(request, form_for_form, form, entry, attachments)
             if not self.request.is_ajax():
-                return redirect(form.redirect_url or
-                    reverse("form_sent", kwargs={"slug": form.slug}))
+                return redirect(form.redirect_url or reverse("form_sent", kwargs={"slug": form.slug}))
         context = {"form": form, "form_for_form": form_for_form}
         return self.render_to_response(context)
 
@@ -95,6 +94,7 @@ class FormDetail(TemplateView):
             "message": form.email_message,
             "request": request,
         }
+
         email_from = form.email_from or settings.DEFAULT_FROM_EMAIL
         email_to = form_for_form.email_to()
         if email_to and form.send_email:
@@ -106,11 +106,45 @@ class FormDetail(TemplateView):
             headers = {"Reply-To": email_to}
         email_copies = split_choices(form.email_copies)
         if email_copies:
+            if form.send_csv:
+                self.attach_csv(fields, attachments)
             send_mail_template(subject, "form_response_copies", email_from,
                                email_copies, context=context,
                                attachments=attachments,
                                fail_silently=EMAIL_FAIL_SILENTLY,
                                headers=headers)
+
+    # -----------------------------------------------------------------------------
+    #     - Email csv to admin -
+    # -----------------------------------------------------------------------------
+    def attach_csv(self, fields, attachments):
+        import tempfile
+        import csv
+        with tempfile.NamedTemporaryFile("w+r") as csvfile:
+            filewriter = csv.writer(csvfile, delimiter=str(','), quotechar=str('|'), quoting=csv.QUOTE_MINIMAL)
+            headings, values = self.fields_to_ep_morris_format(fields)
+            filewriter.writerow(headings)
+            filewriter.writerow(values)
+            csvfile.seek(0)
+            csv_bytes = csvfile.read()
+            attachments.append(("formdata.csv", csv_bytes))
+
+    def fields_to_ep_morris_format(self, fields):
+        """
+        Change bool values to TRUE / FALSE
+        """
+        headings = []
+        values = []
+        for (key, value) in fields:
+            if value is True:
+                values.append("TRUE")
+            elif value is False:
+                values.append("FALSE")
+            else:
+                values.append(value)
+            headings.append(key)
+        return headings, values
+
 
 form_detail = FormDetail.as_view()
 

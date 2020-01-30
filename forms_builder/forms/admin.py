@@ -41,11 +41,11 @@ form_admin_fieldsets = [
         ("publish_date", "expiry_date",),
         "intro", "button_text", "response", "redirect_url")}),
     (_("Email"), {"fields": ("send_email", "email_from", "email_copies",
-        "email_subject", "email_message")}),]
+        "send_csv", "email_subject", "email_message")}), ]
 
 if EDITABLE_SLUGS:
     form_admin_fieldsets.append(
-            (_("Slug"), {"fields": ("slug",), "classes": ("collapse",)}))
+        (_("Slug"), {"fields": ("slug", ), "classes": ("collapse", )}))
 
 if USE_SITES:
     form_admin_fieldsets.append((_("Sites"), {"fields": ("sites",),

@@ -90,6 +90,10 @@ class AbstractForm(models.Model):
         max_length=200)
     email_subject = models.CharField(_("Subject"), max_length=200, blank=True)
     email_message = models.TextField(_("Message"), blank=True)
+    send_csv = models.BooleanField(
+        default=False,
+        help_text=_("Attach a CSV file")
+    )
 
     objects = FormManager()
 

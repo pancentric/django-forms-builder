@@ -8,7 +8,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import Context, RequestContext, Template
 from django.test import TestCase
 
-from forms_builder.forms.fields import NAMES, FILE, SELECT
+from forms_builder.forms.fields import NAMES, FILE, SELECT, TEXT, CHECKBOX
 from forms_builder.forms.forms import FormForForm
 from forms_builder.forms.models import (Form, Field,
                                         STATUS_DRAFT, STATUS_PUBLISHED)
@@ -45,7 +45,7 @@ class Tests(TestCase):
         """
         Test that a form with draft status is only visible to staff.
         """
-        settings.DEBUG = True # Don't depend on having a 404 template.
+        settings.DEBUG = True  # Don't depend on having a 404 template.
         username = "test"
         password = "test"
         User.objects.create_superuser(username, "", password)
@@ -111,7 +111,6 @@ class Tests(TestCase):
         # may not be NULL
         form_for_form.save()
 
-
     def test_field_validate_slug_names(self):
         form = Form.objects.create(title="Test")
         field = Field(form=form,
@@ -133,6 +132,24 @@ class Tests(TestCase):
                       label='x' * (max_slug_length + 1), field_type=NAMES[0][0])
         field.save()
         self.assertLessEqual(len(field.slug), max_slug_length)
+
+    def test_generate_csv_file(self):
+        form = Form.objects.create(title="Test form", send_csv=True)
+        Field.objects.create(form=form, label='first name', field_type=TEXT)
+        Field.objects.create(form=form, label='last name', field_type=TEXT)
+        Field.objects.create(form=form, label='is true', field_type=CHECKBOX)
+        Field.objects.create(form=form, label='is false', field_type=CHECKBOX)
+        if USE_SITES:
+            form.sites.add(self._site)
+            form.save()
+        self.client.get(form.get_absolute_url())
+        fields = form.fields.visible()
+        data = {
+            fields[0].slug: "Dirk",
+            fields[1].slug: "Gently",
+            fields[2].slug: "checked",
+        }
+        self.client.post(form.get_absolute_url(), data=data)
 
     def test_field_default_ordering(self):
         form = Form.objects.create(title="Test")
