@@ -131,7 +131,8 @@ class FormDetail(TemplateView):
 
     def fields_to_ep_morris_format(self, fields):
         """
-        Change bool values to TRUE / FALSE
+        Change bool values to TRUE / FALSE,
+        remove newline chars, and remove double spaces.
         """
         headings = []
         values = []
@@ -141,6 +142,7 @@ class FormDetail(TemplateView):
             elif value is False:
                 values.append("FALSE")
             else:
+                value = ' '.join(value.split())
                 values.append(value)
             headings.append(key)
         return headings, values
