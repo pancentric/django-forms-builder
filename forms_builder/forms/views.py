@@ -127,7 +127,7 @@ class FormDetail(TemplateView):
             filewriter.writerow(values)
             csvfile.seek(0)
             csv_bytes = csvfile.read()
-            attachments.append(("formdata.csv", csv_bytes))
+            attachments.append(("csv-formdata.csv", csv_bytes))
 
     def fields_to_ep_morris_format(self, fields):
         """
