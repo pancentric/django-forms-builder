@@ -121,13 +121,14 @@ class FormDetail(TemplateView):
         import tempfile
         import csv
         with tempfile.NamedTemporaryFile("w+r") as csvfile:
-            filewriter = csv.writer(csvfile, delimiter=str(','), quotechar=str('|'), quoting=csv.QUOTE_MINIMAL)
+            filewriter = csv.writer(csvfile, delimiter=str(','), quotechar=str('"'), quoting=csv.QUOTE_MINIMAL)
             headings, values = fields_to_ep_morris_format(fields)
             filewriter.writerow(headings)
             filewriter.writerow(values)
             csvfile.seek(0)
             csv_bytes = csvfile.read()
             attachments.append(("csv-formdata.csv", csv_bytes))
+
 
 form_detail = FormDetail.as_view()
 
