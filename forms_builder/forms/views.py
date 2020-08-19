@@ -87,7 +87,7 @@ class FormDetail(TemplateView):
         for (k, v) in form_for_form.fields.items():
             value = form_for_form.cleaned_data[k]
             if isinstance(value, list):
-                value = ", ".join([i.strip() for i in value])
+                value = u", ".join([i.strip() for i in value])
             fields.append((v.label, value))
         context = {
             "fields": fields,
@@ -142,14 +142,14 @@ def fields_to_ep_morris_format(fields):
     values = []
     for (key, value) in fields:
         if value is True:
-            values.append("TRUE")
+            values.append(u"TRUE")
         elif value is False:
-            values.append("FALSE")
+            values.append(u"FALSE")
         elif isinstance(value, str):
-            value = ' '.join(value.split())
+            value = u' '.join(value.split())
             values.append(value)
         elif isinstance(value, unicode):
-            value = ' '.join(value.split())
+            value = u' '.join(value.split())
             values.append(value)
         else:
             values.append(value)
