@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 import json
@@ -147,13 +148,13 @@ def fields_to_ep_morris_format(fields):
             values.append(u"FALSE")
         elif isinstance(value, str):
             value = u' '.join(value.split())
-            values.append(value)
+            values.append(value.encode('utf-8'))
         elif isinstance(value, unicode):
             value = u' '.join(value.split())
-            values.append(value)
+            values.append(value.encode('utf-8'))
         else:
             values.append(value)
-        headings.append(key)
+        headings.append(key.encode('utf-8'))
 
     return headings, values
 
